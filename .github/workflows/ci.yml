@@ -53,6 +53,53 @@ jobs:
       - run: npm ci
       - run: npm run build
 
+  visual:
+    name: visual
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      # The web server builds the app itself (see playwright.config.ts), so
+      # this compares screenshots with the backend mocked and the clock
+      # frozen. After an intentional UI change, run
+      # `npm run test:visual:update` locally and commit the new snapshots.
+      - run: npm run test:visual
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: visual-test-results
+          path: |
+            test-results/
+            playwright-report/
+
+  e2e:
+    name: e2e
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      # The web server builds the app itself (see playwright.config.ts).
+      # Each flow runs against a mocked API with a mock wallet and mock RPC
+      # (see src/lib/e2e-seam.ts): no testnet, indexer or wallet needed.
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: e2e-test-results
+          path: |
+            test-results/
+            playwright-report/
+
   bot:
     name: auto-merge bot tests
     runs-on: ubuntu-latest

@@ -5,6 +5,7 @@ import { useState } from 'react';
 
 import type { Voucher } from '@/lib/api';
 import { formatDate, formatUsdc, timeUntil } from '@/lib/amounts';
+import { trackEvent, type AnalyticsEvent } from '@/lib/analytics';
 import { explorerTx } from '@/lib/config';
 import { DISPUTE_REASONS, disputeReasonLabel, type DisputeReasonCode } from '@/lib/disputes';
 import { humaniseError } from '@/lib/errors';
@@ -14,6 +15,15 @@ import { useWallet } from '@/lib/wallet';
 import { Alert, Button, Card, ExplorerLink, StatusBadge } from './ui';
 
 type Action = 'claim' | 'attest' | 'settle' | 'refund' | 'dispute';
+
+/** Funnel step per contract write. Names only — never any properties. */
+const ACTION_EVENTS = {
+  claim: 'voucher_claimed',
+  attest: 'care_confirmed',
+  dispute: 'dispute_opened',
+  settle: 'voucher_settled',
+  refund: 'voucher_refunded',
+} as const satisfies Record<Action, AnalyticsEvent>;
 
 export function VoucherRow({
   v,
@@ -51,6 +61,7 @@ export function VoucherRow({
       const res = await fns[action]();
       setHash(res.hash);
       setDisputing(false);
+      trackEvent(ACTION_EVENTS[action]);
       onDone?.();
     } catch (err) {
       setError(humaniseError(err));

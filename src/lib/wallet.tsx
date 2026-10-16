@@ -14,6 +14,7 @@ import {
 } from 'react';
 
 import { config } from './config';
+import { mockWalletAddress } from './e2e-seam';
 
 /**
  * Wallet connection.
@@ -67,11 +68,17 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
   // Restore a previous session silently. The kit keeps its own selection in
   // storage; if the wallet is locked or was revoked this simply fails and
-  // the user sees the connect button.
+  // the user sees the connect button. Playwright end-to-end tests inject
+  // window.__SCI_MOCK_WALLET__ instead (see e2e-seam.ts) and skip the kit.
   useEffect(() => {
-    ensureInit();
     let cancelled = false;
     (async () => {
+      const mocked = mockWalletAddress();
+      if (mocked) {
+        if (!cancelled) setAddress(mocked);
+        return;
+      }
+      ensureInit();
       try {
         const { address: addr } = await StellarWalletsKit.getAddress();
         if (!cancelled && addr) setAddress(addr);
@@ -85,6 +92,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const connect = useCallback(async () => {
+    const mocked = mockWalletAddress();
+    if (mocked) {
+      setAddress(mocked);
+      return;
+    }
     ensureInit();
     setConnecting(true);
     setError(null);
@@ -102,7 +114,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
   const disconnect = useCallback(async () => {
     try {
-      await StellarWalletsKit.disconnect();
+      if (!mockWalletAddress()) await StellarWalletsKit.disconnect();
     } finally {
       setAddress(null);
     }
@@ -111,6 +123,10 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const signTransaction = useCallback(
     async (xdr: string) => {
       if (!address) throw new Error('Connect a wallet first');
+      // Test signer: echoes the transaction back. The RPC mock (when present)
+      // accepts it without submission; without the RPC mock the network
+      // rejects it, so this can never sign a real transaction.
+      if (mockWalletAddress()) return xdr;
       const { signedTxXdr } = await StellarWalletsKit.signTransaction(xdr, {
         address,
         networkPassphrase: config.networkPassphrase,

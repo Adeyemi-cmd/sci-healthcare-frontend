@@ -29,7 +29,12 @@ npm run build
   introduces key handling will be rejected.
 - **Nothing identifying leaves the browser.** The patient identifier and HMAC key
   are used locally to derive `beneficiaryRef` and must never be sent to the API,
-  logged, or put in a URL.
+  logged, or put in a URL. The same holds for analytics: pageviews use
+  normalized routes and funnel events carry names only — never addresses,
+  references, amounts or voucher ids (see `src/lib/analytics.ts`). Error
+  reports go through the `beforeSend` scrubber in
+  `src/lib/error-reporting.ts`, which redacts the same material; keep replay
+  and tracing off.
 - **`NEXT_PUBLIC_*` is inlined at build time.** Setting these only in a host's
   runtime environment produces a build still pointing at localhost. If you add
   one, document it in `.env.example` and the README.
@@ -58,6 +63,11 @@ fix(wallet): restore session after the kit rotates its storage key
 
 - `npm run typecheck` and `npm run build` must pass.
 - Screenshots for any visible change, light background at minimum.
+- Visual snapshots cover the six routes at desktop and 390px widths
+  (`npm run test:visual`, mocked API, frozen clock). After an intentional UI
+  change, run `npm run test:visual:update` and commit the new snapshots.
+- End-to-end tests drive the fund, claim, attest, dispute and refund flows
+  (`npm run test:e2e`, mock wallet and RPC, no testnet needed).
 - No new dependency without saying in the PR why it is needed.
 
 ## How pull requests are merged

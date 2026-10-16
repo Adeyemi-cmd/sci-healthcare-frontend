@@ -106,8 +106,18 @@ Every one of these is inlined into the client bundle at **build** time.
 | `NEXT_PUBLIC_USDC_CONTRACT_ID` | `CCRLJ7FEIKTR3GBT3VQQPSIJGRBO2WPNMVFKJDP6AYGJQWECOR4QVE5M` |
 | `NEXT_PUBLIC_FAUCET_CONTRACT_ID` | `CCB25WG7DQ2CSNXPTOHZO2PDZ324FQPZLH3LSNCCLWYM3FEH52GEXC47` (testnet only; leave unset in production) |
 | `NEXT_PUBLIC_USDC_ISSUER` | `GCKX5KAFVF7GLFZ3JWQGJ4F62RYYZU67PI3TACBGKVPJ73JELMI3L4KR` |
+| `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` | `(optional) analytics domain, e.g. `app.example.com`; unset disables analytics entirely` |
+| `NEXT_PUBLIC_SENTRY_DSN` | `(optional) Sentry DSN for error reporting; unset disables it entirely` |
 
 > If the deployed app still calls `localhost`, these were set in the host's **runtime** environment but not its **build** environment. Next inlines `NEXT_PUBLIC_*` at build time; setting them afterwards changes nothing. This is the single most common deployment failure for this shape of app.
+
+## Analytics
+
+Usage analytics is cookieless [Plausible](https://plausible.io), behind `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` — unset means no script loads and nothing is sent. Pageviews use normalized routes (`/clinics/[address]`, never the address), and funnel events (`voucher_funded`, `voucher_claimed`, `care_confirmed`, `dispute_opened`, `voucher_settled`, `voucher_refunded`) carry names only: no addresses, patient references, amounts or voucher ids ever leave the browser.
+
+## Error reporting
+
+Uncaught errors are reported to [Sentry](https://sentry.io), behind `NEXT_PUBLIC_SENTRY_DSN` — unset means the SDK never initialises. Every report passes through a `beforeSend` scrubber (`src/lib/error-reporting.ts`) that normalizes dynamic routes and redacts 64-hex digests, Stellar addresses and sensitive query parameters, so patient references, secret keys and beneficiary hashes never leave the browser. Tracing and session replay stay off.
 
 ## Deploying
 

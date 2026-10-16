@@ -2,8 +2,11 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { ConnectButton } from '@/components/ConnectButton';
+import { Analytics } from '@/components/Analytics';
+import { ErrorReporter } from '@/components/ErrorReporter';
 import { NavLink } from '@/components/ui';
 import { WalletProvider } from '@/lib/wallet';
+import { config } from '@/lib/config';
 
 import './globals.css';
 
@@ -17,6 +20,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
+        {config.plausibleDomain ? <Analytics domain={config.plausibleDomain} /> : null}
+        <ErrorReporter />
         <WalletProvider>
           <header className="border-b border-[var(--color-line)] bg-[var(--color-surface)]">
             <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">

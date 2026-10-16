@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- Visual regression snapshots for the six routes (`/`, `/clinics/[address]`, `/my`, `/clinic`, `/attest`, `/vouchers/[id]`) at desktop and 390px widths, with the API mocked, the clock frozen and RPC blocked. Runs in CI; regenerate with `npm run test:visual:update`.
+- End-to-end tests for the fund, claim, attest, dispute and refund flows at desktop and 390px widths, with a mock wallet and mock RPC behind `window.__SCI_MOCK_WALLET__` / `window.__SCI_MOCK_RPC__` (test-only, no keys, production behaviour unchanged). Runs in CI as `npm run test:e2e`.
+- Cookieless usage analytics (Plausible) behind `NEXT_PUBLIC_PLAUSIBLE_DOMAIN`; unset disables it entirely. Pageviews use normalized routes and funnel events carry names only, so no addresses, references or amounts ever leave the browser.
+- Error reporting (Sentry) behind `NEXT_PUBLIC_SENTRY_DSN`; unset means the SDK never initialises. A `beforeSend` scrubber normalizes dynamic routes and redacts 64-hex digests, Stellar addresses and sensitive query parameters, so patient references, keys and beneficiary hashes never leave the browser. Tracing and session replay stay off.
+
 ## 0.2.0 — 2026-10-09
 
 ### Added

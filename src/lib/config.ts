@@ -34,6 +34,16 @@ export const config = {
   },
   /** Issuer of the demo USDC, needed to add the asset in a wallet. */
   usdcIssuer: process.env.NEXT_PUBLIC_USDC_ISSUER ?? '',
+  /**
+   * Plausible domain for cookieless usage analytics. Empty disables it
+   * entirely: no script tag is rendered and no events are sent.
+   */
+  plausibleDomain: process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN ?? '',
+  /**
+   * Sentry DSN for error reporting. Empty disables it entirely: the SDK is
+   * never initialised and no report leaves the browser.
+   */
+  sentryDsn: process.env.NEXT_PUBLIC_SENTRY_DSN ?? '',
 } as const;
 
 export function requireContracts(): void {

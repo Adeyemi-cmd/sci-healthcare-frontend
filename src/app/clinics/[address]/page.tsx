@@ -5,6 +5,7 @@ import { use, useEffect, useMemo, useState } from 'react';
 
 import { api, type Provider, type Service } from '@/lib/api';
 import { formatUsdc, shortAddress, toAmountInput, toBaseUnits } from '@/lib/amounts';
+import { trackEvent } from '@/lib/analytics';
 import { beneficiaryRef, generateKey, localIdentity } from '@/lib/beneficiary';
 import { useSavedIdentity } from '@/lib/useSavedIdentity';
 import { config, explorerTx } from '@/lib/config';
@@ -127,6 +128,7 @@ export default function ClinicPage({
       if (typeof res.returnValue === 'bigint' || typeof res.returnValue === 'number') {
         setFundedId(String(res.returnValue));
       }
+      trackEvent('voucher_funded');
     } catch (err) {
       setError(humaniseError(err, VOUCHER_ERRORS));
     } finally {
