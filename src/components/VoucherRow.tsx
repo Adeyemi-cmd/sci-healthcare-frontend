@@ -79,6 +79,7 @@ export function VoucherRow({
   const { t } = useLocaleContext();
   const nowInternal = useNow();
   const now = nowProp ?? nowInternal;
+  const { locale } = useLocaleContext();
   const toast = useToast();
   const [busy, setBusy] = useState<Action | null>(null);
   // After a write the chain has moved but the indexer lags (#9): while
@@ -233,8 +234,8 @@ export function VoucherRow({
 
       {v.status === 'Attested' && v.disputeDeadline && !v.isSettleable && (
         <p className="mt-3 text-xs text-[var(--color-ink-soft)]">
-          Dispute window closes in {timeUntil(v.disputeDeadline, now)} — settles after
-          that.
+          Dispute window closes {timeUntil(v.disputeDeadline, now, locale)} — settles
+          after that.
           <InfoTip content="The funder can dispute before the window closes. After it closes, anyone can release the payment to the clinic." />
         </p>
       )}
@@ -248,12 +249,12 @@ export function VoucherRow({
         <>
           {v.claimedAt && (
             <p className="mt-3 text-xs text-[var(--color-ink-soft)]">
-              Claimed {timeSince(v.claimedAt, now)}.
+              Claimed {timeSince(v.claimedAt, now, locale)}.
             </p>
           )}
           <p className="mt-1 text-xs">
-            Refundable in <span className={isUrgent(v.refundableAt, now) ? 'font-semibold text-[var(--color-danger)]' : ''}>
-              {timeUntil(v.refundableAt, now)}
+            Refundable <span className={isUrgent(v.refundableAt, now) ? 'font-semibold text-[var(--color-danger)]' : ''}>
+              {timeUntil(v.refundableAt, now, locale)}
             </span>
             ({formatDate(v.refundableAt)}).
             <InfoTip content="An independent attester must confirm care was delivered. Without confirmation the funder can reclaim after this date." />
