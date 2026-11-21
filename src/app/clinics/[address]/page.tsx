@@ -37,7 +37,6 @@ import { usdc, voucher } from '@/lib/protocol';
 import { quoteXlmForUsdc, type RestoreFootprintSignContext } from '@/lib/stellar';
 import { TransactionTimeoutError, RETRY_FEE_MULTIPLIER } from '@/lib/stellar';
 import { sponsorshipAvailable, SPONSOR_MAX_AMOUNT } from '@/lib/sponsorship';
-import { registryStatusReasonLabel } from '@/lib/status';
 import { useWallet } from '@/lib/wallet';
 import { SavedPatientControls } from '@/components/SavedPatientControls';
 import { useLocaleContext } from '@/i18n/LocaleContext';

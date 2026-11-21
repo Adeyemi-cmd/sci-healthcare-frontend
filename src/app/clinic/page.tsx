@@ -318,8 +318,6 @@ export default function ClinicDeskPage() {
     setPrice(toAmountInput(s.price));
   }
 
-  const [isRetiring, setIsRetiring] = useState(false);
-
   if (!address) {
     return <Empty>{t('clinic.connectWallet')}</Empty>;
   }
@@ -795,7 +793,10 @@ export default function ClinicDeskPage() {
               <Button
                 variant="danger"
                 disabled={busy || !reasonCode}
-                onClick={() => setConfirmRetire(reasonCode)}
+                onClick={() => {
+                  retireVoucher(reasonCode ?? 0);
+                  setConfirmRetire(null);
+                }}
               >
                 {busy ? t('common.confirming') : t('clinic.retire')}
               </Button>
