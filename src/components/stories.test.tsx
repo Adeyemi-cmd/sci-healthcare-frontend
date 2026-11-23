@@ -5,6 +5,15 @@ import axe from 'axe-core';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type React from 'react';
 
+// `VoucherRow` links through `DetailLink`, which asks Next for a router to
+// prefetch its page on intent. Stories render outside the app router, so
+// supply the two methods it calls instead of failing on the invariant.
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ prefetch: vi.fn(), push: vi.fn(), replace: vi.fn() }),
+  usePathname: () => '/',
+  useSearchParams: () => new URLSearchParams(),
+}));
+
 /**
  * Runs the stories (#350).
  *
